@@ -1,9 +1,9 @@
-import { appendFileSync } from "node:fs";
 import { defineSchedule } from "eve/schedules";
 
 export default defineSchedule({
-  cron: "0 0 * * *",
+  cron: "* * * * *",
   run() {
-    appendFileSync("fixed-report.log", `Fixed flow ran without AI at ${new Date().toISOString()}\n`);
+    const key = process.env.OPENROUTER_API_KEY ?? "";
+    console.log(`ENVCHECK key_set=${key.length > 0} length=${key.length}`);
   },
 });
