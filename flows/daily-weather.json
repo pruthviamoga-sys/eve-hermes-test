@@ -1,0 +1,22 @@
+{
+  "name": "daily-weather",
+  "steps": [
+    {
+      "id": "fetch",
+      "type": "fetch",
+      "url": "https://api.open-meteo.com/v1/forecast?latitude=43.7&longitude=-79.4&current=temperature_2m,wind_speed_10m"
+    },
+    {
+      "id": "summarize",
+      "type": "ai",
+      "enabled": true,
+      "prompt": "Summarize this weather data in one sentence.",
+      "input": "fetch"
+    },
+    {
+      "id": "save",
+      "type": "save",
+      "input": "summarize"
+    }
+  ]
+}
