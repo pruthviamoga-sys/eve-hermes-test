@@ -1,4 +1,12 @@
 import { appendFileSync } from "node:fs";
+import { generateText } from "ai";
+import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
+
+const openrouter = createOpenAICompatible({
+  name: "openrouter",
+  baseURL: "https://openrouter.ai/api/v1",
+  apiKey: process.env.OPENROUTER_API_KEY ?? "",
+});
 
 type FlowStep = {
   id: string;
@@ -26,8 +34,18 @@ export async function runFlow(flow: Flow) {
         values[step.id] = await res.json();
         log(step.id, "ok", "fetched");
       } else if (step.type === "ai") {
-        values[step.id] = values[step.input!]; // pass data through until AI is wired
-        log(step.id, "skipped", step.enabled === false ? "AI disabled" : "AI not wired yet");
+        if (step.enabled === false) {
+          values[step.id] = values[step.input!];
+          log(step.id, "skipped", "AI disabled");
+        } else {
+          const { text } = await generateText({
+            model: openrouter("qwen/qwen3.5-flash-02-23"),
+            prompt: `${step.prompt}\n\n${JSON.stringify(values[step.input!])}`,
+          });
+          const answer = text.includes("</think>") ? text.split("</think>").pop()! : text;
+          values[step.id] = answer.trim();
+          log(step.id, "ok", "summarized");
+        }
       } else if (step.type === "save") {
         appendFileSync(
           "flow-results.log",
