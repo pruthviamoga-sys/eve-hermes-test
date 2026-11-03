@@ -9,7 +9,7 @@
     {
       "id": "summarize",
       "type": "ai",
-      "enabled": true,
+      "enabled": false,
       "prompt": "Summarize this weather data in one sentence.",
       "input": "fetch"
     },
